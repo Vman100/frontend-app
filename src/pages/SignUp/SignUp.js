@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { createBrowserHistory } from "history";
 import axios from "axios";
 import './SignUp.scss';
-const history = createBrowserHistory({ forceRefresh: true });
 
 class SignUp extends Component {
     constructor(props) {
@@ -26,6 +24,7 @@ class SignUp extends Component {
             isValidPassword: false,
             isValidEmail: false,
             isValidReferralCode: false,
+            isSignedUp: false
         };
         this.handleChange = this.handleChange.bind(this);
         this.userNameValidator = this.userNameValidator.bind(this);
@@ -141,52 +140,59 @@ class SignUp extends Component {
                     console.log(res.data.code);
                     if(res.data.code==="Signup successful"){
                     //should let user check their email first
-                        history.push("signIn");
-                    }else{
-                        this.setState(prevState => ({
-                            errors: { ...prevState.errors, api: 'Sign up failed! Please try again!' },
-                        }))
+                        this.setState({signedUp: true})
                     }
                 })
             } catch (e) {
-                return e.message
+                this.setState(prevState => ({
+                    errors: { ...prevState.errors, api: 'Sign up failed! Please try again!' },
+                }))
             } 
         }
     };
 
     render(){
-        const {signUpData, errors} = this.state
+        const {signUpData, errors, isSignedUp} = this.state
+        if(isSignedUp) {
+            return (
+                <div className="signin-container">
+                    <label>Sign Up Successfully! Please login your email to verify</label>
+                    <NavLink to="/signIn"> Sign In</NavLink>
+                </div>
+            )
+        }
         return (
-        <div className="signin-container">
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <div className="form-group">
-                        <input type="text" className="form-control" name="userName" placeholder="Uername" value={signUpData.userName} onChange={this.handleChange} required></input>
-                        <span style={{color: "red"}}>{errors.userName}</span>
-                    </div>
-                    <div className="form-group">
-                        <input type="password" className="form-control" name="password" placeholder="Password" value={signUpData.password} onChange={this.handleChange} required></input>
-                        <span style={{color: "red"}}>{errors.password}</span>
-                    </div>
-                    <div className="form-group">
-                        <input type="email" className="form-control" name="email" placeholder="Email" value={signUpData.email} onChange={this.handleChange} required></input>
-                        <span style={{color: "red"}}>{errors.email}</span>
-                    </div>
-                    <div className="form-group">
-                        <input type="text" className="form-control" name="referralCode" placeholder="Referral code" value={signUpData.referralCode} onChange={this.handleChange} required></input>
-                        <span style={{color: "red"}}>{errors.referralCode}</span>
-                    </div>
-                    <div >
-                        <button type="submit" name="signIn" className=" btn btn-info signup-btn">Sign Up</button>
-                        <span style={{color: "red"}}>{errors.api}</span>
-                    </div>
-                </form>
+            <div className="signin-container">
+                <div>
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="form-group">
+                            <input type="text" className="form-control" name="userName" placeholder="Uername" value={signUpData.userName} onChange={this.handleChange} required></input>
+                            <span style={{color: "red"}}>{errors.userName}</span>
+                        </div>
+                        <div className="form-group">
+                            <input type="password" className="form-control" name="password" placeholder="Password" value={signUpData.password} onChange={this.handleChange} required></input>
+                            <span style={{color: "red"}}>{errors.password}</span>
+                        </div>
+                        <div className="form-group">
+                            <input type="email" className="form-control" name="email" placeholder="Email" value={signUpData.email} onChange={this.handleChange} required></input>
+                            <span style={{color: "red"}}>{errors.email}</span>
+                        </div>
+                        <div className="form-group">
+                            <input type="text" className="form-control" name="referralCode" placeholder="Referral code" value={signUpData.referralCode} onChange={this.handleChange} required></input>
+                            <span style={{color: "red"}}>{errors.referralCode}</span>
+                        </div>
+                        <div >
+                            <button type="submit" name="signIn" className=" btn btn-info signup-btn">Sign Up</button>
+                            <span style={{color: "red"}}>{errors.api}</span>
+                        </div>
+                    </form>
+                </div>
+                <div className="signup-options-container">
+                    <NavLink to="/signIn" className="signup-link" >Sign In</NavLink>
+                    <NavLink to="/forgotpassword" className="forgot-password-link">Forgot</NavLink>
+                </div>
             </div>
-            <div className="signup-options-container">
-                <NavLink to="/signIn" className="signup-link" >Sign In</NavLink>
-                <NavLink to="/forgotpassword" className="forgot-password-link">Forgot</NavLink>
-            </div>
-        </div>)
+        )
     }
 }
 
